@@ -81,10 +81,17 @@ ax4.set_title("l = {}".format(l[3]))
 ax4.axhline(means[3], label='time-average', color='r', linestyle='-')
 plt.show()
 
+
+
 # Ensemble
 # Time-average mean
 plt.axhline(ensemble_mean, label='time-average', color='r', linestyle='-')
 # Ensemble average
 plt.plot(ensemble, color='b', label='Ensemble')
 plt.legend()
+plt.show()
+
+flatX = X.flatten()
+n, bins, patches = plt.hist(flatX, 25, facecolor='b')
+plt.grid(True)
 plt.show()
