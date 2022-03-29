@@ -13,7 +13,6 @@
 # 1d) Perform event-based resampling of RW_01 with the thresholds of λ = 0.5 and 0.8. Don't forget to take the first derivative before thresholding!
 
 import numpy as np
-import random
 import matplotlib.pyplot as plt
 
 # Parameters
@@ -54,43 +53,39 @@ resampled_with50_RW01 = np.take(RAND_WALKS[0], indices_50)
 
 # 1d)
 LAMBDA_1 = 0.5
-kept_indices_2nd = np.arange(1, RW_LENGTH, 2)
 evnt_bsd_05 = np.zeros(0)
 t_indices_05 = np.zeros(0)
 
-for t in range (len(downsampled_2nd_RW01)):
-    if (t == 0):
-        dx_dt = (downsampled_2nd_RW01[t] - 0) / (kept_indices_2nd[t] - 0)
-    else:
-        dx_dt = (downsampled_2nd_RW01[t] - downsampled_2nd_RW01[t - 1]) / (kept_indices_2nd[t] - kept_indices_2nd[t - 1])
-
-    if (abs(dx_dt) >= LAMBDA_1):
-        evnt_bsd_05 = np.append(evnt_bsd_05, dx_dt)
-        t_indices_05 = np.append(t_indices_05, kept_indices_2nd[t])
-
-t_indices_05 = np.asarray(t_indices_05, dtype=int)
-
 LAMBDA_2 = 0.8
-kept_indices_10th = np.delete(np.arange(0, RAND_WALKS[0].size, 1), every10th_indices)
 evnt_bsd_08 = np.zeros(0)
 t_indices_08 = np.zeros(0)
 
-for t in range (len(downsampled_10th_RW01)):
+prev_t = 0
+for t, val in enumerate(RAND_WALKS[0]):
     if (t == 0):
-        dx_dt = (downsampled_10th_RW01[t] - 0) / (kept_indices_10th[t] - 0)
+        dx_dt = 0 
     else:
-        dx_dt = (downsampled_10th_RW01[t] - downsampled_10th_RW01[t - 1]) / (kept_indices_10th[t] - kept_indices_10th[t - 1])
+        dx_dt = (RAND_WALKS[0][t] - RAND_WALKS[0][t - 1]) / (t - prev_t)
+        prev_t = t
+
+    if (abs(dx_dt) >= LAMBDA_1):
+        evnt_bsd_05 = np.append(evnt_bsd_05, dx_dt)
+        t_indices_05 = np.append(t_indices_05, t)
 
     if (abs(dx_dt) >= LAMBDA_2):
         evnt_bsd_08 = np.append(evnt_bsd_08, dx_dt)
-        t_indices_08 = np.append(t_indices_08, kept_indices_10th[t])
+        t_indices_08 = np.append(t_indices_08, t)
 
+t_indices_05 = np.asarray(t_indices_05, dtype=int)
 t_indices_08 = np.asarray(t_indices_08, dtype=int)
 
 # 2) Calculate the RMSE of your 1b, 1c and 1d against the RW_ref.
 #    Which method worked the best, and why?
 
 # RMSE 1b
+kept_indices_2nd = np.arange(1, RW_LENGTH, 2)
+kept_indices_10th = np.delete(np.arange(0, RAND_WALKS[0].size, 1), every10th_indices)
+
 rmse1b_1 = 0
 for t, val in enumerate(kept_indices_2nd):
     rmse1b_1 = rmse1b_1 + np.square((RW_ref[val] - downsampled_2nd_RW01[t]))
