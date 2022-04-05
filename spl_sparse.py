@@ -98,7 +98,7 @@ t_indices_25 = np.asarray(t_indices_25, dtype=int)
 
 # 4) Calculate the RMSE of the original SPL dataset against 3a (10th value), 3b (10, 50 samples) and 3c (λ = 10).
 #    What is the effect of smoothing on the sparse resampling of the SPL data?
-
+kept_indices_2nd = np.arange(1, decibels.size, 2)
 kept_indices_10th = np.delete(np.arange(0, decibels.size, 1), every10th_indices)
 rmse_3a = 0
 for t, val in enumerate(kept_indices_10th):
@@ -128,10 +128,12 @@ for t, val in enumerate(t_indices_10):
 
 print ("RMSE 3c: {}".format(rmse_3c))
 
+gauss_filtered_3 = scipy.ndimage.gaussian_filter1d(downsampled_every_2nd, SIGMA, truncate=trun3)
+
 # Plotting
 plt.plot(decibels, 'b', label='spl')
 #plt.plot(indices_10, resampled_with10, 'r--.', label='r10')
-plt.plot(gauss_filtered_1, 'k', label='gauss 2')
+plt.plot(kept_indices_2nd, gauss_filtered_3, 'k', label='gauss 3')
 # plt.plot(t_indices_05, evnt_bsd_05, 'k', label='evnt 5')
 # plt.plot(t_indices_10, evnt_bsd_10, 'r', label='evnt 10')
 # plt.plot(t_indices_25, evnt_bsd_25, 'c', label='evnt 25')
